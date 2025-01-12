@@ -93,6 +93,7 @@ uploadRouter.post("/upload-code", async (req : Request, res : Response ) : Promi
             }
             fs.rmSync(path.join(dirname,`output/${id}`),{recursive : true, force : true})
             redisClient.lPush("build-queue", id)
+            redisClient.hSet("status",id,"uploaded")
             return res.status(200).json({
                 message : "Repo cloned successfully.",
                 id

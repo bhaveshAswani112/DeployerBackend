@@ -3,8 +3,8 @@ import * as AWS from "aws-sdk";
 import { ACCESS_KEY_ID,SECRET_ACCESS_KEY,S3_URL } from "./constant";
 import * as path from "path"
 import fs from "fs"
-import { spawn, exec } from 'child_process';
-import { rejects } from 'assert';
+import {  exec } from 'child_process';
+
 
 
 
@@ -112,25 +112,29 @@ async function buildProject(id: string) {
 
 async function main() {
     try {
-        const redisClient = await createClient({
+        const subscriber = await createClient({
             url: 'redis://localhost:6379'
         }).connect()
-
+        const publisher = await createClient({
+            url: 'redis://localhost:6379'
+        }).connect()
         while (true) {
-            const id : string | null = await redisClient.rPop("build-queue")
+            const id : string | null = await subscriber.rPop("build-queue")
             // console.log(__dirname)
             if(id){
                 console.log(id)
-                // await downloadSourceCode(id)
-                // await buildProject(id)
+                await downloadSourceCode(id)
+                await buildProject(id)
                 console.log("Build completed")
                 const paths = await getPaths(path.join(__dirname,`output/${id}/dist`))
-                console.log(paths)
+                // console.log(paths)
                 paths.map(async (path) => {
                     const fileName = path.replace(__dirname, "").replace(/\\/g, "/").startsWith("/") ? path.replace(__dirname, "").replace(/\\/g, "/").substring(1) : path.replace(__dirname, "").replace(/\\/g, "/")
                     await uploadToS3(fileName,path)
+                    console.log("upload completed")
                 })
                 console.log("All files uploaded successfully")
+                publisher.hSet("status",id,"deployed")
             }
         }
     } catch (error) {
@@ -138,5 +142,6 @@ async function main() {
         console.log(error)
     }
 }
+
 
 main()
