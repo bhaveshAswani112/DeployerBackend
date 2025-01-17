@@ -7,7 +7,6 @@ import {  exec } from 'child_process';
 
 
 
-
 const s3Client = new AWS.S3({
     accessKeyId : ACCESS_KEY_ID,
     secretAccessKey : SECRET_ACCESS_KEY,
@@ -82,7 +81,7 @@ export const uploadToS3 = async (fileName : string, filePath : string) => {
 async function buildProject(id: string) {
     return new Promise((resolve,reject) => {
             try {
-                const child = exec(`cd ${path.join(__dirname, `output/${id}`)} && yarn install && yarn build`);
+                const child = exec(`cd ${path.join(__dirname, `output/${id}`)} && npm install && npm run build`);
                 child.stdout?.on("data", (data) => {
                     console.log(`stdout: ${data}`);
                 });

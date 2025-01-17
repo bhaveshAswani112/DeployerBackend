@@ -1,7 +1,6 @@
-import { Router, Request, Response, RequestHandler  } from "express";
+import { Router, Request, Response  } from "express";
 import {z} from "zod"
 import simpleGit from "simple-git";
-import crypto from "crypto"
 import fs from "fs"
 import path  from "path";
 import { dirname } from "../constant.js";
@@ -30,7 +29,8 @@ const urlSchema = z.object({
       .regex(
         /^https:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+(\/[A-Za-z0-9_.-]+)?$/,
         "Invalid GitHub URL"
-      )
+      ),
+      id: z.number()
   });
 
 
@@ -82,18 +82,19 @@ uploadRouter.post("/upload-code", async (req : Request, res : Response ) : Promi
                     message : "Invalid url"
                 })
             }
-            const {githubUrl} = data.data
-            const id = crypto.randomBytes(64).toString('hex')
-            await git.clone(githubUrl,path.join(dirname,`output/${id}`))
-            const paths = await getPaths(path.join(dirname,`output/${id}`))
-            for(const file of paths) {
-                const fileName = file.replace(dirname, "").replace(/\\/g, "/").startsWith("/") ? file.replace(dirname, "").replace(/\\/g, "/").substring(1) : file.replace(dirname, "").replace(/\\/g, "/")
-                // console.log(fileName)
-                await uploadToS3(fileName,file)
-            }
-            fs.rmSync(path.join(dirname,`output/${id}`),{recursive : true, force : true})
-            redisClient.lPush("build-queue", id)
-            redisClient.hSet("status",id,"uploaded")
+            const {githubUrl,id} = data.data
+            const gitId = id.toString()
+            // await git.clone(githubUrl,path.join(dirname,`output/${id}`))
+            // const paths = await getPaths(path.join(dirname,`output/${id}`))
+            // for(const file of paths) {
+            //     const fileName = file.replace(dirname, "").replace(/\\/g, "/").startsWith("/") ? file.replace(dirname, "").replace(/\\/g, "/").substring(1) : file.replace(dirname, "").replace(/\\/g, "/")
+            //     // console.log(fileName)
+            //     await uploadToS3(fileName,file)
+            // }
+            // fs.rmSync(path.join(dirname,`output/${id}`),{recursive : true, force : true})
+           
+            redisClient.lPush("build-queue", gitId )
+            redisClient.hSet("status",gitId , "uploaded")
             return res.status(200).json({
                 message : "Repo cloned successfully.",
                 id
