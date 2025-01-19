@@ -2,8 +2,8 @@
 
 This application mimics the functionality of Vercel, focusing on deploying Vite React projects using a microservices architecture. It consists of the following components:
 
-1. **Upload Service**: Handles repository cloning and uploads content to S3.
-2. **Deploy Service**: Builds the project and uploads the built project to S3.
+1. **Upload Service**: Handles repository cloning and uploads content to R2.
+2. **Deploy Service**: Builds the project and uploads the built project to R2.
 3. **Request Handler Service**: Serves the deployed files to users upon request.
 4. **Next.js Frontend**: Provides a user interface for managing deployments.
 
@@ -57,11 +57,16 @@ This application mimics the functionality of Vercel, focusing on deploying Vite 
 - **Tech Stack**: Next.js, React, TypeScript
 
 
+Future Enhancements
+
+Implement a caching mechanism in the Request Handler Service to improve response times for frequently accessed files. 
+
+
 
 ## Contributors
 
 - **Bhavesh Aswani**
 - **Vinay Kumar**
 
-Feel free to raise issues or contribute to this project through pull requests!
+
 
