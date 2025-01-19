@@ -11,6 +11,7 @@
     "@types/aws-sdk": "^2.7.4",
     "aws-sdk": "^2.1692.0",
     "child_process": "^1.0.2",
+    "dotenv": "^16.4.7",
     "path": "^0.12.7",
     "redis": "^4.7.0"
   },
